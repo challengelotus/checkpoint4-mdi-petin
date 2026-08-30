@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo-petin.png" alt="Logo Petin" width="200"/>
+  <img src="assets/logo.jpeg" alt="Logo Petin" width="200"/>
   <h1>🐾 Petin</h1>
   <p><em>Saúde e carinho em cada patinha</em></p>
   <p>

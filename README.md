@@ -31,6 +31,8 @@ O **Petin** resolve isso centralizando tudo em um único lugar, com lembretes in
 
 > *As telas abaixo representam a identidade visual do projeto, desenvolvidas no Figma. As funcionalidades estão em fase de implementação.*
 
+🔗 **[Acessar Protótipo no Figma](https://www.figma.com/proto/nD5XSQOaVLNMA6bBoJ2MJA/Sem-t%C3%ADtulo?node-id=5-165&t=teiQvUETLAFzmC1V-1)**
+
 <div align="center">
   <img src="assets/screenshot-demo.png" alt="Demonstração das Telas do Petin" width="700"/>
   <p><i>Em breve: GIF animado com a navegação completa do app.</i></p>

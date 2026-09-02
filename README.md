@@ -15,6 +15,58 @@
   </p>
 </div>
 
+## 📌 O Problema
+
+Você já passou por alguma dessas situações?
+
+- ❌ Perdeu a carteirinha de vacinação do seu pet e não lembra quais doses já foram aplicadas?
+- ❌ Esqueceu a data do próximo vermífugo ou da vacina antirrábica?
+- ❌ Chegou no veterinário sem saber informar o histórico de alergias ou cirurgias do animal?
+- ❌ Não tem um lugar único para guardar os comprovantes de consultas e exames?
+
+**Essa é a realidade da maioria dos tutores de pets.** A falta de um prontuário digital centralizado coloca a saúde dos animais em risco e gera estresse desnecessário para os donos. O **PetCare** nasceu para acabar com esse problema.
+
+---
+
+## 🚀 A Solução (Proposta de Valor)
+
+O **PetCare** é o **prontuário digital definitivo** para o seu pet. Mais do que um simples calendário de lembretes, nós oferecemos:
+
+- **Centralização total:** Vacinas, consultas, medicamentos e alergias em um único lugar, acessível a qualquer momento.
+- **Lembretes inteligentes:** Alertas proativos por Push Notification (e futuramente por WhatsApp/E-mail) para que você nunca mais perca uma data importante.
+- **Segurança e compartilhamento:** Capacidade de gerar um relatório completo (PDF) para enviar ao veterinário antes mesmo da consulta, agilizando o atendimento.
+- **Tranquilidade:** Saber que a saúde do seu pet está sob controle, com histórico imutável e backup seguro.
+
+*Nossa promessa é transformar o cuidado animal em uma experiência simples, organizada e proativa.*
+
+---
+
+## 💡 Modelo de Negócio e Ideia de Venda
+
+### Como o PetCare se sustenta?
+Adotamos o modelo **Freemium com Assinatura Premium (PetCare+)**. Acreditamos que todos os tutores merecem ter o básico para cuidar bem do seu pet, mas oferecemos funcionalidades avançadas para quem busca uma gestão completa e integrada.
+
+| Recurso | Plano Gratuito (Free) | Plano PetCare+ (Premium) |
+| :--- | :---: | :---: |
+| **Número de Pets** | Até 1 pet | ✅ Ilimitado |
+| **Registro de Vacinas** | Limitado (5 registros) | ✅ Ilimitado |
+| **Histórico de Consultas** | Básico (3 consultas) | ✅ Ilimitado com anexos |
+| **Lembretes por Push** | ✅ Sim | ✅ Sim |
+| **Lembretes por WhatsApp/E-mail** | ❌ Não | ✅ Sim |
+| **Compartilhamento de Prontuário (PDF)** | ❌ Não | ✅ Sim |
+| **Backup em Nuvem** | ❌ Não | ✅ Sim |
+| **Relatórios Mensais de Saúde** | ❌ Não | ✅ Sim |
+| **Preço** | **Gratuito** | **R$ 19,90/mês** <br> ou <br> **R$ 199,00/ano** |
+
+### Diferencial Competitivo (O que nos torna únicos?)
+
+| Concorrente | Foco Principal | Lacuna que o PetCare preenche |
+| :--- | :--- | :--- |
+| **DogHero** | Serviços (hospedagem e passeio) | Não foca em prontuário médico/calendário vacinal. |
+| **Petlove** | E-commerce (rações e produtos) | O histórico de saúde é secundário e não gera alertas proativos. |
+| **Agendas de Pet Genéricas** | Apenas lembretes simples | Não permitem anexar comprovantes (fotos de exames) nem compartilhar com clínicas. |
+| **PetCare (NOSSO APP)** | **Saúde Integral + Rotina** | Unifica o **prontuário** com um **sistema de alertas inteligentes** e **compartilhamento com veterinários**, resolvendo a dor do extravio de informações. |
+
 ---
 
 ## 📝 Descrição do Projeto

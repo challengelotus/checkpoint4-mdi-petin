@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
+
 import {
     Poppins_400Regular,
     Poppins_500Medium,
@@ -19,5 +20,11 @@ export default function RootLayout() {
         return null;
     }
 
-    return <Stack />;
+    return (
+        <Stack
+            screenOptions={{
+                headerShown: false,
+            }}
+        />
+    );
 }

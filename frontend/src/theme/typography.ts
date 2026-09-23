@@ -10,7 +10,7 @@ export const typography = {
     },
 
     h3: {
-        fontFamily: 'Poppins_600SemiBold',
+        fontFamily: 'Poppins_700Bold',
         fontSize: 20,
     },
 
@@ -24,8 +24,23 @@ export const typography = {
         fontSize: 14,
     },
 
+    bodyMedium: {
+        fontFamily: 'Poppins_500Medium',
+        fontSize: 14,
+    },
+
+    bodySemiBold: {
+        fontFamily: 'Poppins_600SemiBold',
+        fontSize: 14,
+    },
+
     caption: {
         fontFamily: 'Poppins_400Regular',
+        fontSize: 12,
+    },
+
+    captionMedium: {
+        fontFamily: 'Poppins_500Medium',
         fontSize: 12,
     },
 } as const;

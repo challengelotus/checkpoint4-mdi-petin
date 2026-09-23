@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     StyleProp,
     StyleSheet,
@@ -9,21 +8,26 @@ import {
 
 import { colors, typography } from '@/theme';
 
-type Variant =
+type TypographyVariant =
     | 'h1'
     | 'h2'
     | 'h3'
     | 'h4'
     | 'body'
-    | 'caption';
+    | 'bodyMedium'
+    | 'bodySemiBold'
+    | 'caption'
+    | 'captionMedium';
 
 interface TypographyProps extends TextProps {
-    variant?: Variant;
+    variant?: TypographyVariant;
+    color?: string;
     style?: StyleProp<TextStyle>;
 }
 
 export function Typography({
     variant = 'body',
+    color = colors.brown,
     style,
     children,
     ...props
@@ -33,6 +37,7 @@ export function Typography({
             style={[
                 styles.base,
                 styles[variant],
+                { color },
                 style,
             ]}
             {...props}
@@ -44,7 +49,7 @@ export function Typography({
 
 const styles = StyleSheet.create({
     base: {
-        color: colors.brown,
+        includeFontPadding: false,
     },
 
     h1: {
@@ -72,8 +77,23 @@ const styles = StyleSheet.create({
         fontSize: typography.body.fontSize,
     },
 
+    bodyMedium: {
+        fontFamily: typography.bodyMedium.fontFamily,
+        fontSize: typography.bodyMedium.fontSize,
+    },
+
+    bodySemiBold: {
+        fontFamily: typography.bodySemiBold.fontFamily,
+        fontSize: typography.bodySemiBold.fontSize,
+    },
+
     caption: {
         fontFamily: typography.caption.fontFamily,
         fontSize: typography.caption.fontSize,
+    },
+
+    captionMedium: {
+        fontFamily: typography.captionMedium.fontFamily,
+        fontSize: typography.captionMedium.fontSize,
     },
 });

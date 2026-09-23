@@ -2,6 +2,7 @@
   "expo": {
     "name": "Petin-App",
     "slug": "Petin-App",
+    "scheme": "Petin-App",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,11 +20,15 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-font",
       "expo-router"
-    ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

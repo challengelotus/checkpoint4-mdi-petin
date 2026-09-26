@@ -7,7 +7,7 @@ import {
   Usuario,
 } from '../../types/auth';
 
-export const supabaseAuthService: AuthService = {
+export const authService: AuthService = {
   async cadastrar(dados: CriarUsuarioDTO): Promise<AuthResponse> {
     
     // 1. Cria a conta de autenticação no Supabase Auth

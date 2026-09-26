@@ -63,7 +63,7 @@ async function calcularStatusPet(petId: string): Promise<StatusPet> {
   return 'Em Dia';
 }
 
-export const supabasePetService: PetService = {
+export const petService: PetService = {
   async listarPorUsuario(usuarioId: string): Promise<Pet[]> {
     const { data, error } = await supabase
       .from('pets')

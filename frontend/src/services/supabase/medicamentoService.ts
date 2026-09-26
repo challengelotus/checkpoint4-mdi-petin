@@ -8,7 +8,7 @@ import {
   StatusDoseMedicamento,
 } from '../../types/medicamento';
 
-export const supabaseMedicamentoService: MedicamentoService = {
+export const medicamentoService: MedicamentoService = {
   async listarPorPet(petId: string): Promise<Medicamento[]> {
     const { data: medicamentos, error: medError } = await supabase
       .from('medicamentos')

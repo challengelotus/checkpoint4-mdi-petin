@@ -6,7 +6,7 @@ import {
   AtualizarConsultaDTO,
 } from '../../types/consulta';
 
-export const supabaseConsultaService: ConsultaService = {
+export const consultaService: ConsultaService = {
   async listarPorPet(petId: string): Promise<Consulta[]> {
     const { data, error } = await supabase
       .from('consultas')

@@ -10,7 +10,7 @@ import {
   AtualizarDoseVacinaDTO,
 } from '../../types/vacina';
 
-export const supabaseVacinaService: VacinaService = {
+export const vacinaService: VacinaService = {
   async listarPorPet(petId: string): Promise<ResumoVacina[]> {
     const { data, error } = await supabase
       .from('vacinas')

@@ -28,7 +28,7 @@ async function validarPlanoUsuarioPorPet(petId: string): Promise<string> {
   return usuario.plano;
 }
 
-export const supabaseDocumentoService: DocumentoService = {
+export const documentoService: DocumentoService = {
   async listarPorPet(petId: string): Promise<Documento[]> {
     const { data, error } = await supabase
       .from('documentos')

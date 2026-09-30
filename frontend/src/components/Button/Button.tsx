@@ -2,6 +2,8 @@ import {
     ActivityIndicator,
     Pressable,
     StyleSheet,
+    StyleProp,
+    ViewStyle,
 } from 'react-native';
 
 import { colors } from '@/theme';
@@ -12,6 +14,7 @@ interface ButtonProps {
     onPress: () => void;
     loading?: boolean;
     disabled?: boolean;
+    style?: StyleProp<ViewStyle>;
 }
 
 export function Button({
@@ -19,6 +22,7 @@ export function Button({
     onPress,
     loading = false,
     disabled = false,
+    style,
 }: ButtonProps) {
     return (
         <Pressable

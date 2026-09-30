@@ -17,6 +17,7 @@ interface HeaderProps {
     onBack?: () => void;
     rightIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
     onRightPress?: () => void;
+    titleColor?: string;
 }
 
 export function Header({
@@ -25,6 +26,7 @@ export function Header({
     onBack,
     rightIcon,
     onRightPress,
+    titleColor = colors.brown,
 }: HeaderProps) {
     return (
         <View style={styles.container}>
@@ -37,13 +39,13 @@ export function Header({
                         <MaterialCommunityIcons
                             name="chevron-left"
                             size={26}
-                            color={colors.brown}
+                            color={titleColor}
                         />
                     </Pressable>
                 )}
 
                 <View>
-                    <Typography variant="h3">
+                    <Typography variant="h3" color={titleColor}>
                         {title}
                     </Typography>
 
@@ -68,6 +70,7 @@ export function Header({
                         name={rightIcon}
                         size={22}
                         color={colors.backgroundLight}
+                        backgroundColor={titleColor}
                     />
                 </Pressable>
             )}
@@ -100,8 +103,6 @@ const styles = StyleSheet.create({
         height: 42,
 
         borderRadius: 10,
-
-        backgroundColor: colors.brown,
 
         alignItems: 'center',
         justifyContent: 'center',

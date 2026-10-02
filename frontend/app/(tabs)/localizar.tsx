@@ -42,10 +42,10 @@ export default function LocalizarScreen() {
           />
 
           <LocationOptionCard
-            title="Localizar Chico"
+            title="Localizar Pet"
             description="Veja a posição do pet via chip/rastreador"
             onPress={() =>
-              router.push('/localizar-chico')
+              router.push('/localizar-pet')
             }
           />
         </View>

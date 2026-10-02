@@ -68,12 +68,18 @@ export default function HomeScreen() {
                 </View>
 
                 <View style={styles.pets}>
-                    <PetCard
-                        name="Chico"
-                        species="Cachorro"
-                        breed="Spitz Alemão"
-                        status="em-dia"
-                    />
+                    <Pressable 
+                        onPress={() =>
+                            router.push('/dashboard-pet')
+                        }
+                    >
+                        <PetCard
+                            name="Chico"
+                            species="Cachorro"
+                            breed="Spitz Alemão"
+                            status="em-dia"
+                        />
+                    </Pressable>
 
                     <PetCard
                         name="Violeta"

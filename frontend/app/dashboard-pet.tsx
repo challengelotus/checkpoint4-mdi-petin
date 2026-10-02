@@ -6,9 +6,13 @@ import {
   View,
 } from 'react-native';
 
-import { router } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 
 import { colors } from '@/theme';
+
+import {
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
 
 import {
   Pet,
@@ -18,6 +22,7 @@ import {
 import { DashboardButton } from '@/components/DashboardButton/DashboardButton';
 import { ActivityCard } from '@/components/ActivityCard/ActivityCard';
 import { Typography } from '@/components/Typography/Typography';
+import { Header } from '@/components/Header/Header';
 
 const pets: Pet[] = [
   {
@@ -44,17 +49,18 @@ export default function DashboardPetScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Header
+          title="Chico"
+          onBack={() => router.back()}
+          titleColor={colors.backgroundLight}
+          fontSize="h2"
+        />
+      </View>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Typography
-          variant="h2"
-          color={colors.backgroundLight}
-        >
-          Chico
-        </Typography>
-
         <PetSelector
           pets={pets}
           selectedPet={selectedPet}
@@ -108,12 +114,16 @@ export default function DashboardPetScreen() {
           <View style={styles.row}>
             <DashboardButton
               title="Perfil"
-              onPress={() => {}}
+              onPress={() => {
+                router.push('/perfl-pet');
+              }}
             />
 
             <DashboardButton
               title="Localizar"
-              onPress={() => {}}
+              onPress={() => {
+                router.push('/localizar-pet');
+              }}
             />
           </View>
         </View>
@@ -153,12 +163,23 @@ const styles = StyleSheet.create({
 
     backgroundColor: colors.primary,
   },
+  
+  header: {
+    paddingTop: 54,
+    paddingHorizontal: 30,
+
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    gap: 8,
+  },
 
   content: {
     paddingHorizontal: 30,
-    paddingTop: 54,
+    paddingTop: 26,
     paddingBottom: 32,
   },
+
 
   vaccineCard: {
     marginTop: 28,

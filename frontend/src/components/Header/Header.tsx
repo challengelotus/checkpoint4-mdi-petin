@@ -18,6 +18,7 @@ interface HeaderProps {
     rightIcon?: keyof typeof MaterialCommunityIcons.glyphMap;
     onRightPress?: () => void;
     titleColor?: string;
+    fontSize?: string;
 }
 
 export function Header({
@@ -27,6 +28,7 @@ export function Header({
     rightIcon,
     onRightPress,
     titleColor = colors.brown,
+    fontSize = "h3",
 }: HeaderProps) {
     return (
         <View style={styles.container}>
@@ -45,7 +47,7 @@ export function Header({
                 )}
 
                 <View>
-                    <Typography variant="h3" color={titleColor}>
+                    <Typography variant={fontSize} color={titleColor}>
                         {title}
                     </Typography>
 

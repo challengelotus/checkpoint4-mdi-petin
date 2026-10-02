@@ -5,8 +5,11 @@ import {
   View,
 } from 'react-native';
 
+import { router } from 'expo-router';
+
 import { colors } from '@/theme';
 import { Typography } from '@/components/Typography/Typography';
+import { Header } from '@/components/Header/Header';
 
 interface ProfileHeaderProps {
   name: string;
@@ -27,24 +30,14 @@ export function ProfileHeader({
 }: ProfileHeaderProps) {
   return (
     <View style={styles.container}>
-      <Pressable
-        onPress={onBack}
-        style={styles.backButton}
-      >
-        <Typography
-          variant="h2"
-          color={colors.backgroundLight}
-        >
-          ‹
-        </Typography>
-      </Pressable>
-
-      <Typography
-        variant="h2"
-        color={colors.backgroundLight}
-      >
-        Perfil completo
-      </Typography>
+      <View style={styles.header}>
+        <Header
+          title="Perfil Completo"
+          onBack={() => router.back()}
+          titleColor={colors.backgroundLight}
+          fontSize="h2"
+        />
+      </View>
 
       <View style={styles.petContainer}>
         <View style={styles.petInfo}>
@@ -96,6 +89,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: 26,
     paddingTop: 54,
+  },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    gap: 8,
   },
 
   backButton: {

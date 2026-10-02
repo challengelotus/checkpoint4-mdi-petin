@@ -18,16 +18,16 @@ import {
   PetLocationCard,
 } from '@/components/PetLocationCard/PetLocationCard';
 
-export default function LocalizarChicoScreen() {
+export default function LocalizarPetScreen() {
   return (
     <View style={styles.container}>
-        <View style={styles.header}>
-                    <Header
-                        title="Localizar Chico"
-                        onBack={() => router.back()}
-                        titleColor={colors.backgroundLight}
-                    />
-                </View>
+      <View style={styles.header}>
+        <Header
+            title="Localizar Chico"
+            onBack={() => router.back()}
+            titleColor={colors.backgroundLight}
+        />
+      </View>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}

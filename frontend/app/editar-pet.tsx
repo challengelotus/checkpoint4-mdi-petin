@@ -14,6 +14,7 @@ import { colors } from '@/theme';
 import { Typography } from '@/components/Typography/Typography';
 import { FormInput } from '@/components/FormInput/FormInput';
 import { Button } from '@/components/Button/Button';
+import { Header } from '@/components/Header/Header';
 
 export default function EditarPetScreen() {
   const [name, setName] = useState('Chico');
@@ -29,26 +30,17 @@ export default function EditarPetScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Header
+          title="Chico"
+          onBack={() => router.back()}
+          fontSize="h2"
+        />
+      </View>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.titleContainer}>
-          <Pressable
-            onPress={() => router.back()}
-          >
-            <Typography
-              variant="h2"
-              color={colors.brown}
-            >
-              ‹
-            </Typography>
-          </Pressable>
-
-          <Typography variant="h2">
-            Editar pet
-          </Typography>
-        </View>
 
         <View style={styles.form}>
           <FormInput
@@ -155,9 +147,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
+  header: {
+    paddingTop: 54,
+    paddingHorizontal: 30,
+
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    gap: 8,
+  },
+
   content: {
     paddingHorizontal: 42,
-    paddingTop: 70,
     paddingBottom: 40,
   },
 

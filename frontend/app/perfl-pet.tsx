@@ -42,7 +42,7 @@ import {
   Typography,
 } from '@/components/Typography/Typography';
 
-export default function PerfilScreen() {
+export default function PerfilPetScreen() {
   const [activeTab, setActiveTab] =
     useState<ProfileTab>('dados');
 
@@ -158,12 +158,13 @@ export default function PerfilScreen() {
         />
 
         {renderContent()}
-
-        <Button
-          title="Compartilhar prontuário"
-          onPress={() => {}}
-          style={styles.shareButton}
-        />
+        
+        <View style={styles.shareButton}>
+          <Button
+            title="Compartilhar prontuário"
+            onPress={() => {}}
+          />
+        </View>
 
         <Pressable
           onPress={() => {}}

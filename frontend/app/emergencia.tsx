@@ -9,31 +9,21 @@ import { router } from 'expo-router';
 import { colors } from '@/theme';
 
 import { ContactCard } from '@/components/ContactCard/ContactCard';
-import { PawIcon } from '@/components/PawIcon/PawIcon';
+import { Header } from '@/components/Header/Header';
 import { Typography } from '@/components/Typography/Typography';
 
 export default function EmergenciaScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <Pressable
-                    onPress={() => router.back()}
-                    style={styles.back}
-                >
-                    <Typography
-                        variant="h2"
-                        color={colors.backgroundLight}
-                    >
-                        ‹
-                    </Typography>
-                </Pressable>
-
-                <Typography
-                    variant="h2"
-                    color={colors.backgroundLight}
-                >
-                    Emergência
-                </Typography>
+                <View style={styles.header}>
+                    <Header
+                        title="Emergência"
+                        onBack={() => router.back()}
+                        titleColor={colors.backgroundLight}
+                        fontSize="h2"
+                    />
+                </View>
 
                 <Typography
                     variant="body"
@@ -66,6 +56,13 @@ const styles = StyleSheet.create({
         flex: 1,
 
         backgroundColor: colors.primary,
+    },
+
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+
+        gap: 8,
     },
 
     content: {

@@ -15,6 +15,7 @@ import { colors } from '@/theme';
 
 import { Typography } from '@/components/Typography/Typography';
 import { MedicationCard } from '@/components/MedicationCard/MedicationCard';
+import { Header } from '@/components/Header/Header';
 
 export default function MedicamentosScreen() {
   return (
@@ -24,22 +25,11 @@ export default function MedicamentosScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View style={styles.titleContainer}>
-            <Pressable
-              onPress={() => router.back()}
-            >
-              <Typography
-                variant="h2"
-                color={colors.brown}
-              >
-                ‹
-              </Typography>
-            </Pressable>
-
-            <Typography variant="h2">
-              Medicamentos
-            </Typography>
-          </View>
+          <Header
+            title="Medicamentos"
+            onBack={() => router.back()}
+            fontSize="h2"
+        />
 
           <Pressable
             style={styles.addButton}

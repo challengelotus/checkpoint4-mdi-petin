@@ -1,16 +1,11 @@
+import { CriarConsultaDTO } from './consulta';
+
 export interface EventoCalendario {
   id: string;
   hora: string; 
   titulo: string;
   tipo: 'CONSULTA' | 'VACINA' | 'MEDICAMENTO';
   petNome?: string;
-}
-
-export interface CriarConsultaDTO {
-  petId: string;
-  local?: string;
-  observacao?: string;
-  dataHora: string; 
 }
 
 export interface CalendarioService {

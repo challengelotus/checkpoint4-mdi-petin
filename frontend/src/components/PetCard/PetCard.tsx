@@ -1,132 +1,194 @@
 import {
     Image,
+    Pressable,
     StyleSheet,
     View,
 } from 'react-native';
 
 import { colors } from '@/theme';
+
 import { Typography } from '@/components/Typography/Typography';
-import {
-    PetStatus,
-    StatusBadge,
-} from '@/components/StatusBadge/StatusBadge';
+
+import { Pet } from '@/types/pet';
 
 interface PetCardProps {
-    name: string;
-    species: string;
-    breed: string;
-    status: PetStatus;
-    image?: string;
+    pet: Pet;
+    onPress?: () => void;
 }
 
 export function PetCard({
-    name,
-    species,
-    breed,
-    status,
-    image,
+    pet,
+    onPress,
 }: PetCardProps) {
-    const statusColor = {
-        'em-dia': colors.success,
-        atencao: colors.warning,
-        atrasado: colors.error,
-    }[status];
+    const status = pet.status ?? 'Em Dia';
 
     return (
-        <View
+        <Pressable
+            onPress={onPress}
             style={[
                 styles.container,
-                {
-                    borderLeftColor: statusColor,
-                },
+                getStatusStyle(status),
             ]}
         >
-            {image ? (
+            {pet.fotoLink ? (
                 <Image
-                    source={{ uri: image }}
-                    style={styles.avatar}
+                    source={{
+                        uri: pet.fotoLink,
+                    }}
+                    style={styles.image}
                 />
             ) : (
-                <View style={styles.avatarPlaceholder}>
-                    <Typography
-                        variant="h4"
-                        color={colors.brownLight}
-                    >
-                        🐾
-                    </Typography>
-                </View>
+                <View style={styles.placeholder} />
             )}
 
             <View style={styles.info}>
                 <Typography
-                    variant="captionMedium"
+                    variant="bodyMedium"
                     color={colors.brown}
                 >
-                    {name}
+                    {pet.nome}
                 </Typography>
 
                 <Typography
                     variant="caption"
-                    color={colors.textSecondary}
+                    color={colors.brownLight}
                 >
-                    {species} - {breed}
+                    {pet.especie}
+                    {pet.raca
+                        ? ` - ${pet.raca}`
+                        : ''}
                 </Typography>
             </View>
 
-            <StatusBadge status={status} />
-        </View>
+            <View
+                style={[
+                    styles.status,
+                    getStatusBackground(status),
+                ]}
+            >
+                <Typography
+                    variant="captionMedium"
+                    color={getStatusTextColor(status)}
+                >
+                    {status}
+                </Typography>
+            </View>
+        </Pressable>
     );
+}
+
+function getStatusStyle(status: Pet['status']) {
+    switch (status) {
+        case 'Atenção':
+            return styles.attentionBorder;
+
+        case 'Atrasado':
+            return styles.lateBorder;
+
+        default:
+            return styles.onTimeBorder;
+    }
+}
+
+function getStatusBackground(
+    status: Pet['status']
+) {
+    switch (status) {
+        case 'Atenção':
+            return styles.attentionBackground;
+
+        case 'Atrasado':
+            return styles.lateBackground;
+
+        default:
+            return styles.onTimeBackground;
+    }
+}
+
+function getStatusTextColor(
+    status: Pet['status']
+) {
+    switch (status) {
+        case 'Atenção':
+            return colors.warning;
+
+        case 'Atrasado':
+            return colors.error;
+
+        default:
+            return colors.success;
+    }
 }
 
 const styles = StyleSheet.create({
     container: {
-        minHeight: 60,
-
-        paddingHorizontal: 12,
-
-        borderLeftWidth: 4,
-        borderRadius: 12,
-
-        backgroundColor: colors.backgroundLight,
+        minHeight: 72,
 
         flexDirection: 'row',
         alignItems: 'center',
 
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.06,
-        shadowRadius: 4,
+        paddingHorizontal: 16,
 
-        elevation: 2,
+        borderRadius: 14,
+
+        backgroundColor:
+            colors.backgroundLight,
+
+        borderLeftWidth: 5,
     },
 
-    avatar: {
-        width: 38,
-        height: 38,
+    image: {
+        width: 42,
+        height: 42,
 
-        borderRadius: 19,
-
-        marginRight: 10,
+        borderRadius: 21,
     },
 
-    avatarPlaceholder: {
-        width: 38,
-        height: 38,
+    placeholder: {
+        width: 42,
+        height: 42,
 
-        borderRadius: 19,
+        borderRadius: 21,
 
-        marginRight: 10,
-
-        alignItems: 'center',
-        justifyContent: 'center',
-
-        backgroundColor: colors.gray,
+        backgroundColor: '#D9D9D9',
     },
 
     info: {
         flex: 1,
+        marginLeft: 12,
+    },
+
+    status: {
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+
+        borderRadius: 12,
+    },
+
+    onTimeBorder: {
+        borderLeftColor:
+            colors.success,
+    },
+
+    attentionBorder: {
+        borderLeftColor:
+            colors.warning,
+    },
+
+    lateBorder: {
+        borderLeftColor:
+            colors.error,
+    },
+
+    onTimeBackground: {
+        backgroundColor: '#E1E8C9',
+    },
+
+    attentionBackground: {
+        backgroundColor: '#F8E4BA',
+    },
+
+    lateBackground: {
+        backgroundColor: '#F0C7BD',
     },
 });

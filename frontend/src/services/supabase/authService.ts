@@ -21,9 +21,9 @@ export const authService: AuthService = {
 
     const userId = authData.user.id;
 
-    // 2. Insere as informações adicionais na tabela 'usuario'
+    // 2. Insere as informações adicionais na tabela 'usuarios'
     const { data: perfilData, error: perfilError } = await supabase
-      .from('usuario')
+      .from('usuarios')
       .insert({
         id: userId,
         nome: dados.nome,
@@ -64,9 +64,9 @@ export const authService: AuthService = {
       throw new Error('Sessão não encontrada.');
     }
 
-    // Busca os dados do perfil na tabela 'usuario'
+    // Busca os dados do perfil na tabela 'usuarios'
     const { data: perfilData, error: perfilError } = await supabase
-      .from('usuario')
+      .from('usuarios')
       .select('*')
       .eq('id', authData.user.id)
       .single();
@@ -101,7 +101,7 @@ export const authService: AuthService = {
     if (!user) return null;
 
     const { data: perfilData, error } = await supabase
-      .from('usuario')
+      .from('usuarios')
       .select('*')
       .eq('id', user.id)
       .single();

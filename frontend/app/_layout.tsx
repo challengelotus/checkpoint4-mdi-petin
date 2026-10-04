@@ -8,6 +8,8 @@ import {
     Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 
+import { AuthProvider } from '@/contexts/AuthContext';
+
 export default function RootLayout() {
     const [fontsLoaded] = useFonts({
         Poppins_400Regular,
@@ -21,10 +23,12 @@ export default function RootLayout() {
     }
 
     return (
-        <Stack
-            screenOptions={{
-                headerShown: false,
-            }}
-        />
+        <AuthProvider>
+            <Stack
+                screenOptions={{
+                    headerShown: false,
+                }}
+            />
+        </AuthProvider>
     );
 }

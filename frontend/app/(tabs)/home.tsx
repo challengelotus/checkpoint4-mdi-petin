@@ -1,106 +1,186 @@
+import { useCallback, useState } from 'react';
+
 import {
-    Pressable,
+    ActivityIndicator,
+    Alert,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     View,
 } from 'react-native';
 
-import { router } from 'expo-router';
-
-import {
-    MaterialCommunityIcons,
-} from '@expo/vector-icons';
+import { router, useFocusEffect } from 'expo-router';
 
 import { colors } from '@/theme';
 
-import { PetCard } from '@/components/PetCard/PetCard';
 import { Typography } from '@/components/Typography/Typography';
+import { PetCard } from '@/components/PetCard/PetCard';
+
+import { useAuth } from '@/contexts/AuthContext';
+import { petService } from '@/services/supabase/petService';
+
+import { Pet } from '@/types/pet';
 
 export default function HomeScreen() {
+    const { usuario } = useAuth();
+
+    const [pets, setPets] = useState<Pet[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] =
+        useState(false);
+
+    const carregarPets = useCallback(
+        async (refresh = false) => {
+            if (!usuario?.id) {
+                setPets([]);
+                setLoading(false);
+                return;
+            }
+
+            try {
+                if (refresh) {
+                    setRefreshing(true);
+                } else {
+                    setLoading(true);
+                }
+
+                const petsUsuario =
+                    await petService.listarPorUsuario(
+                        usuario.id
+                    );
+
+                setPets(petsUsuario);
+            } catch (error) {
+                console.error(
+                    'Erro ao carregar pets:',
+                    error
+                );
+
+                Alert.alert(
+                    'Erro',
+                    'Não foi possível carregar seus pets.'
+                );
+            } finally {
+                setLoading(false);
+                setRefreshing(false);
+            }
+        },
+        [usuario?.id]
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            carregarPets();
+        }, [carregarPets])
+    );
+
+    function abrirPet(pet: Pet) {
+        router.push({
+            pathname: '/dashboard-pet',
+            params: {
+                petId: pet.id,
+            },
+        });
+    }
+
+    function adicionarPet() {
+        router.push('/cadastrar-pet');
+    }
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator
+                    size="large"
+                    color={colors.primary}
+                />
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <ScrollView
                 contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={() =>
+                            carregarPets(true)
+                        }
+                    />
+                }
             >
                 <View style={styles.header}>
-                    <View>
-                        <Typography variant="h2">
-                            Meus pets
+                    <Typography
+                        variant="caption"
+                        color={colors.brown}
+                    >
+                        Olá,
+                    </Typography>
+
+                    <Typography
+                        variant="h2"
+                        color={colors.brown}
+                    >
+                        {usuario?.nome ?? 'Petin'}
+                    </Typography>
+                </View>
+
+                <View style={styles.titleContainer}>
+                    <Typography
+                        variant="h3"
+                        color={colors.brown}
+                    >
+                        Meus pets
+                    </Typography>
+                </View>
+
+                {pets.length === 0 ? (
+                    <View
+                        style={styles.emptyContainer}
+                    >
+                        <Typography
+                            variant="body"
+                            color={colors.brown}
+                        >
+                            Você ainda não cadastrou
+                            nenhum pet.
                         </Typography>
 
                         <Typography
                             variant="caption"
-                            color={colors.textSecondary}
-                            style={styles.subtitle}
+                            color={colors.brownLight}
+                            style={styles.emptyText}
                         >
-                            3 pets cadastrados
+                            Cadastre seu primeiro pet
+                            para começar a acompanhar
+                            a saúde dele.
                         </Typography>
                     </View>
-
-                    <View style={styles.actions}>
-                        <Pressable
-                            style={styles.emergencyButton}
-                            onPress={() =>
-                                router.push('/emergencia')
-                            }
-                        >
-                            <MaterialCommunityIcons
-                                name="phone-in-talk"
-                                size={20}
-                                color={colors.backgroundLight}
+                ) : (
+                    <View style={styles.petList}>
+                        {pets.map((pet) => (
+                            <PetCard
+                                key={pet.id}
+                                pet={pet}
+                                onPress={() =>
+                                    abrirPet(pet)
+                                }
                             />
-                        </Pressable>
-
-                        <Pressable
-                            style={styles.addButton}
-                            onPress={() =>
-                                router.push('/cadastrar-pet')
-                            }
-                        >
-                            <MaterialCommunityIcons
-                                name="plus"
-                                size={25}
-                                color={colors.backgroundLight}
-                            />
-                        </Pressable>
+                        ))}
                     </View>
-                </View>
+                )}
 
-                <View style={styles.pets}>
-                    <Pressable 
-                        onPress={() =>
-                            router.push('/dashboard-pet')
-                        }
+                <View style={styles.addContainer}>
+                    <Typography
+                        variant="bodyMedium"
+                        color={colors.brown}
+                        onPress={adicionarPet}
                     >
-                        <PetCard
-                            name="Chico"
-                            species="Cachorro"
-                            breed="Spitz Alemão"
-                            status="em-dia"
-                        />
-                    </Pressable>
-
-                    <PetCard
-                        name="Violeta"
-                        species="Gato"
-                        breed="SRD"
-                        status="atencao"
-                    />
-
-                    <PetCard
-                        name="Lisa"
-                        species="Gato"
-                        breed="SRD"
-                        status="em-dia"
-                    />
-
-                    <PetCard
-                        name="Jorge"
-                        species="Ave"
-                        breed="Papagaio"
-                        status="atrasado"
-                    />
+                        + Adicionar pet
+                    </Typography>
                 </View>
             </ScrollView>
         </View>
@@ -110,60 +190,49 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-
         backgroundColor: colors.background,
     },
 
     content: {
-        paddingHorizontal: 20,
-        paddingTop: 56,
-        paddingBottom: 24,
+        paddingHorizontal: 24,
+        paddingTop: 24,
+        paddingBottom: 32,
     },
 
     header: {
-        flexDirection: 'row',
+        marginTop: 24,
+        marginBottom: 32,
+    },
 
+    titleContainer: {
+        marginBottom: 16,
+    },
+
+    petList: {
+        gap: 12,
+    },
+
+    emptyContainer: {
+        padding: 24,
+        borderRadius: 16,
+        backgroundColor: colors.backgroundLight,
         alignItems: 'center',
-        justifyContent: 'space-between',
     },
 
-    subtitle: {
-        marginTop: 4,
+    emptyText: {
+        marginTop: 8,
+        textAlign: 'center',
     },
 
-    actions: {
-        flexDirection: 'row',
-
-        gap: 10,
-    },
-
-    emergencyButton: {
-        width: 38,
-        height: 38,
-
-        borderRadius: 10,
-
-        backgroundColor: colors.brownLight,
-
+    addContainer: {
         alignItems: 'center',
-        justifyContent: 'center',
+        marginTop: 24,
     },
 
-    addButton: {
-        width: 38,
-        height: 38,
-
-        borderRadius: 10,
-
-        backgroundColor: colors.brown,
-
+    loadingContainer: {
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-
-    pets: {
-        marginTop: 18,
-
-        gap: 14,
+        backgroundColor: colors.background,
     },
 });

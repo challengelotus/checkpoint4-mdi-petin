@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import {
+    Alert,
     KeyboardAvoidingView,
     Platform,
     Pressable,
@@ -18,12 +19,57 @@ import { Typography } from '@/components/Typography/Typography';
 import { FormInput } from '@/components/FormInput/FormInput';
 import { Button } from '@/components/Button/Button';
 
+import { useAuth } from '@/contexts/AuthContext';
+
 export default function LoginScreen() {
+    const { login } = useAuth();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    function handleLogin() {
-        router.replace('/(tabs)/home');
+    const [loading, setLoading] = useState(false);
+
+    async function handleLogin() {
+        if (!email.trim()) {
+            Alert.alert(
+                'Atenção',
+                'Digite seu e-mail.'
+            );
+
+            return;
+        }
+
+        if (!password) {
+            Alert.alert(
+                'Atenção',
+                'Digite sua senha.'
+            );
+
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            await login(
+                email.trim(),
+                password
+            );
+
+            router.replace('/(tabs)/home');
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Não foi possível realizar o login.';
+
+            Alert.alert(
+                'Erro ao entrar',
+                message
+            );
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -69,6 +115,7 @@ export default function LoginScreen() {
                         onChangeText={setEmail}
                         keyboardType="email-address"
                         autoCapitalize="none"
+                        autoCorrect={false}
                     />
 
                     <FormInput
@@ -81,9 +128,12 @@ export default function LoginScreen() {
                     <Button
                         title="Entrar"
                         onPress={handleLogin}
+                        loading={loading}
                     />
 
-                    <View style={styles.registerContainer}>
+                    <View
+                        style={styles.registerContainer}
+                    >
                         <Typography
                             variant="caption"
                             color={colors.brown}
@@ -92,8 +142,11 @@ export default function LoginScreen() {
                         </Typography>
 
                         <Pressable
+                            disabled={loading}
                             onPress={() =>
-                                router.push('/(auth)/cadastro')
+                                router.push(
+                                    '/(auth)/cadastro'
+                                )
                             }
                         >
                             <Typography
@@ -114,7 +167,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-
         backgroundColor: colors.primary,
     },
 

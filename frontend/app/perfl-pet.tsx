@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import {
+  ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
 
-import { router } from 'expo-router';
+import {
+  router,
+  useFocusEffect,
+  useLocalSearchParams,
+} from 'expo-router';
 
 import { colors } from '@/theme';
 
@@ -42,38 +48,315 @@ import {
   Typography,
 } from '@/components/Typography/Typography';
 
+import { petService } from '@/services/supabase/petService';
+
+import {
+  vacinaService,
+} from '@/services/supabase/vacinaService';
+
+import { Pet } from '@/types/pet';
+
+import {
+  DoseVacina,
+} from '@/types/vacina';
+
 export default function PerfilPetScreen() {
+  const { petId } =
+    useLocalSearchParams<{
+      petId?: string;
+    }>();
+
   const [activeTab, setActiveTab] =
     useState<ProfileTab>('dados');
 
+  const [pet, setPet] =
+    useState<Pet | null>(null);
+
+  const [historico, setHistorico] =
+    useState<
+      Awaited<
+        ReturnType<
+          typeof petService.obterHistorico
+        >
+      >
+    >([]);
+
+  const [vacinas, setVacinas] =
+    useState<
+      Awaited<
+        ReturnType<
+          typeof vacinaService.listarPorPet
+        >
+      >
+    >([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const carregarPerfil = useCallback(
+    async () => {
+      if (!petId) {
+        Alert.alert(
+          'Erro',
+          'Não foi possível identificar o pet.'
+        );
+
+        router.back();
+
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        const [
+          petData,
+          historicoData,
+          vacinasData,
+        ] = await Promise.all([
+          petService.buscarPorId(petId),
+          petService.obterHistorico(petId),
+          vacinaService.listarPorPet(petId),
+        ]);
+
+        if (!petData) {
+          Alert.alert(
+            'Pet não encontrado',
+            'Não foi possível encontrar esse pet.'
+          );
+
+          router.back();
+
+          return;
+        }
+
+        setPet(petData);
+        setHistorico(historicoData);
+        setVacinas(vacinasData);
+      } catch (error) {
+        console.error(
+          'Erro ao carregar perfil do pet:',
+          error
+        );
+
+        Alert.alert(
+          'Erro',
+          'Não foi possível carregar o perfil do pet.'
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [petId]
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarPerfil();
+    }, [carregarPerfil])
+  );
+
+  function calcularIdade(
+    dataNascimento?: string
+  ) {
+    if (!dataNascimento) {
+      return 'Não informado';
+    }
+
+    const nascimento =
+      new Date(dataNascimento);
+
+    const hoje = new Date();
+
+    let idade =
+      hoje.getFullYear() -
+      nascimento.getFullYear();
+
+    const mes =
+      hoje.getMonth() -
+      nascimento.getMonth();
+
+    if (
+      mes < 0 ||
+      (
+        mes === 0 &&
+        hoje.getDate() <
+          nascimento.getDate()
+      )
+    ) {
+      idade--;
+    }
+
+    if (idade < 1) {
+      const meses =
+        (hoje.getFullYear() -
+          nascimento.getFullYear()) *
+          12 +
+        (hoje.getMonth() -
+          nascimento.getMonth());
+
+      return `${Math.max(0, meses)} ${
+        meses === 1 ? 'mês' : 'meses'
+      }`;
+    }
+
+    return `${idade} ${
+      idade === 1 ? 'ano' : 'anos'
+    }`;
+  }
+
+  function formatarData(
+    data?: string
+  ) {
+    if (!data) {
+      return 'Não informado';
+    }
+
+    const date = new Date(data);
+
+    return date.toLocaleDateString(
+      'pt-BR'
+    );
+  }
+
+  function formatarPeso(
+    peso?: number
+  ) {
+    if (
+      peso === undefined ||
+      peso === null
+    ) {
+      return 'Não informado';
+    }
+
+    return `${peso} kg`;
+  }
+
+  function obterHistoricoPesos() {
+    const pesos = historico
+      .filter(
+        (item) =>
+          item.peso !== undefined &&
+          item.peso !== null
+      )
+      .map(
+        (item) => Number(item.peso)
+      );
+
+    if (
+      pet?.peso !== undefined &&
+      pet.peso !== null &&
+      pesos.length === 0
+    ) {
+      return [pet.peso];
+    }
+
+    return pesos.length > 0
+      ? pesos
+      : [0];
+  }
+
+  function obterVacinaComDoseAplicada() {
+    for (const vacina of vacinas) {
+      // listarPorPet retorna apenas o resumo,
+      // então buscamos uma vacina detalhada
+      // quando necessário.
+    }
+
+    return null;
+  }
+
+  async function excluirPet() {
+    if (!pet) {
+      return;
+    }
+
+    Alert.alert(
+      'Excluir pet',
+      `Deseja realmente excluir ${pet.nome}?`,
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setLoading(true);
+
+              await petService.remover(
+                pet.id
+              );
+
+              Alert.alert(
+                'Pet excluído',
+                'O pet foi removido com sucesso.'
+              );
+
+              router.replace('/(tabs)/home');
+            } catch (error) {
+              console.error(
+                'Erro ao excluir pet:',
+                error
+              );
+
+              Alert.alert(
+                'Erro',
+                'Não foi possível excluir o pet.'
+              );
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  }
+
   function renderContent() {
+    if (!pet) {
+      return null;
+    }
+
     if (activeTab === 'dados') {
       return (
         <ProfileInfoCard
           data={[
             {
               label: 'Nome',
-              value: 'Chico',
+              value: pet.nome,
             },
             {
               label: 'Espécie',
-              value: 'Cachorro',
+              value: pet.especie,
             },
             {
               label: 'Raça',
-              value: 'Spitz alemão',
+              value:
+                pet.raca ||
+                'Não informado',
             },
             {
               label: 'Idade',
-              value: '3 anos',
+              value:
+                calcularIdade(
+                  pet.dataNascimento
+                ),
             },
             {
               label: 'Peso',
-              value: '4 kg',
+              value:
+                formatarPeso(
+                  pet.peso
+                ),
             },
             {
               label: 'Microchip',
-              value: '500284262004445',
+              value:
+                pet.microchip ||
+                'Não informado',
             },
           ]}
         />
@@ -81,10 +364,13 @@ export default function PerfilPetScreen() {
     }
 
     if (activeTab === 'historico') {
+      const pesos =
+        obterHistoricoPesos();
+
       return (
         <>
           <WeightChart
-            values={[3.2, 3.3, 3.7, 4]}
+            values={pesos}
           />
 
           <Typography
@@ -95,18 +381,47 @@ export default function PerfilPetScreen() {
             Vacinas aplicadas
           </Typography>
 
-          <VaccineHistoryCard
-            name="Antirrábica"
-            date="28/02/2026"
-            nextDate="28/02/2027"
-          />
+          {vacinas.length === 0 ? (
+            <Typography
+              variant="caption"
+              color={colors.textSecondary}
+              style={styles.emptyText}
+            >
+              Nenhuma vacina cadastrada.
+            </Typography>
+          ) : (
+            vacinas.map((vacina) => (
+              <VaccineHistoryCard
+                key={vacina.id}
+                name={vacina.nome}
+                date={
+                  vacina.proximaDose
+                    ? formatarData(
+                        vacina.proximaDose
+                          .dataPrevista
+                      )
+                    : 'Sem dose registrada'
+                }
+                nextDate={
+                  vacina.proximaDose
+                    ? formatarData(
+                        vacina.proximaDose
+                          .dataPrevista
+                      )
+                    : 'Não informado'
+                }
+              />
+            ))
+          )}
         </>
       );
     }
 
     return (
       <>
-        <View style={styles.documentsHeader}>
+        <View
+          style={styles.documentsHeader}
+        >
           <Typography
             variant="bodyMedium"
             color={colors.brown}
@@ -116,6 +431,11 @@ export default function PerfilPetScreen() {
 
           <Pressable
             style={styles.addButton}
+            onPress={() =>
+              router.push(
+                '/nova-vacina'
+              )
+            }
           >
             <Typography
               variant="h3"
@@ -126,29 +446,78 @@ export default function PerfilPetScreen() {
           </Pressable>
         </View>
 
-        <View style={styles.documentContainer}>
-          <DocumentCard
-            title="Antirrábica"
-            description="28/02/2026 - Dra Ana / Clínica Amigo Fiel"
-          />
+        <View
+          style={styles.documentContainer}
+        >
+          {vacinas.length === 0 ? (
+            <Typography
+              variant="caption"
+              color={colors.textSecondary}
+            >
+              Nenhum documento cadastrado.
+            </Typography>
+          ) : (
+            vacinas.map((vacina) => (
+              <DocumentCard
+                key={vacina.id}
+                title={vacina.nome}
+                description={
+                  vacina.proximaDose
+                    ? `Próxima dose: ${formatarData(
+                        vacina.proximaDose
+                          .dataPrevista
+                      )}`
+                    : 'Sem próxima dose cadastrada'
+                }
+              />
+            ))
+          )}
         </View>
       </>
     );
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+        />
+      </View>
+    );
+  }
+
+  if (!pet) {
+    return null;
   }
 
   return (
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={
+          styles.content
+        }
       >
         <ProfileHeader
-          name="Chico"
-          species="Cachorro"
-          breed="Spitz alemão"
-          onBack={() => router.back()}
+          name={pet.nome}
+          species={pet.especie}
+          breed={
+            pet.raca ||
+            'Raça não informada'
+          }
+          image={pet.fotoLink}
+          onBack={() =>
+            router.back()
+          }
           onEdit={() =>
-            router.push('/editar-pet')
+            router.push({
+              pathname: '/editar-pet',
+              params: {
+                petId: pet.id,
+              },
+            })
           }
         />
 
@@ -158,8 +527,10 @@ export default function PerfilPetScreen() {
         />
 
         {renderContent()}
-        
-        <View style={styles.shareButton}>
+
+        <View
+          style={styles.shareButton}
+        >
           <Button
             title="Compartilhar prontuário"
             onPress={() => {}}
@@ -167,7 +538,7 @@ export default function PerfilPetScreen() {
         </View>
 
         <Pressable
-          onPress={() => {}}
+          onPress={excluirPet}
           style={styles.deleteButton}
         >
           <Typography
@@ -199,6 +570,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
+  emptyText: {
+    marginHorizontal: 28,
+    marginBottom: 10,
+  },
+
   documentsHeader: {
     marginHorizontal: 28,
 
@@ -211,6 +587,7 @@ const styles = StyleSheet.create({
 
   documentContainer: {
     marginHorizontal: 28,
+    gap: 10,
   },
 
   addButton: {
@@ -234,5 +611,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     marginTop: 16,
+  },
+
+  loadingContainer: {
+    flex: 1,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor:
+      colors.background,
   },
 });

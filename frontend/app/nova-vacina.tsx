@@ -1,30 +1,126 @@
 import { useState } from 'react';
 
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
 
-import { router } from 'expo-router';
+import {
+  router,
+  useLocalSearchParams,
+} from 'expo-router';
 
 import { colors } from '@/theme';
 
 import { Header } from '@/components/Header/Header';
 import { FormInput } from '@/components/FormInput/FormInput';
-import { DateField } from '@/components/DateField/DateField';
 import { Button } from '@/components/Button/Button';
 
+import { vacinaService } from '@/services/supabase/vacinaService';
+import { CriarDoseVacinaDTO } from '@/types/vacina';
+import {
+  dataBRparaISO,
+  mascaraData,
+  mensagemErro,
+} from '@/utils/date';
+
 export default function NovaVacinaScreen() {
+  const { petId } = useLocalSearchParams<{
+    petId?: string;
+  }>();
+
   const [name, setName] = useState('');
   const [applicationDate, setApplicationDate] =
     useState('');
   const [nextDose, setNextDose] = useState('');
   const [clinic, setClinic] = useState('');
   const [notes, setNotes] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  function handleSave() {
-    router.back();
+  async function handleSave() {
+    if (!petId) {
+      Alert.alert('Erro', 'Pet não identificado.');
+      return;
+    }
+
+    if (!name.trim()) {
+      Alert.alert('Atenção', 'Digite o nome da vacina.');
+      return;
+    }
+
+    const aplicacaoISO = applicationDate.trim()
+      ? dataBRparaISO(applicationDate)
+      : null;
+    const proximaISO = nextDose.trim()
+      ? dataBRparaISO(nextDose)
+      : null;
+
+    if (applicationDate.trim() && !aplicacaoISO) {
+      Alert.alert('Atenção', 'Data de aplicação inválida. Use dd/mm/aaaa.');
+      return;
+    }
+
+    if (nextDose.trim() && !proximaISO) {
+      Alert.alert('Atenção', 'Data da próxima dose inválida. Use dd/mm/aaaa.');
+      return;
+    }
+
+    if (!aplicacaoISO && !proximaISO) {
+      Alert.alert(
+        'Atenção',
+        'Informe a data de aplicação ou a data da próxima dose.'
+      );
+      return;
+    }
+
+    const doses: CriarDoseVacinaDTO[] = [];
+
+    if (aplicacaoISO) {
+      doses.push({
+        numeroDose: '1',
+        dataPrevista: aplicacaoISO,
+        dataAplicacao: aplicacaoISO,
+        status: 'CONCLUIDO',
+      });
+    }
+
+    if (proximaISO) {
+      doses.push({
+        numeroDose: String(doses.length + 1),
+        dataPrevista: proximaISO,
+        status: 'PENDENTE',
+      });
+    }
+
+    const observacoes = [
+      clinic.trim() ? `Clínica/Veterinário: ${clinic.trim()}` : '',
+      notes.trim(),
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    try {
+      setLoading(true);
+
+      await vacinaService.cadastrar({
+        petId,
+        nome: name.trim(),
+        observacoes: observacoes || undefined,
+        doses,
+      });
+
+      router.back();
+    } catch (error) {
+      console.error('Erro ao cadastrar vacina:', error);
+      Alert.alert(
+        'Erro',
+        mensagemErro(error, 'Não foi possível salvar a vacina.')
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -32,6 +128,7 @@ export default function NovaVacinaScreen() {
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <Header
           title="Nova vacina"
@@ -45,18 +142,26 @@ export default function NovaVacinaScreen() {
             onChangeText={setName}
           />
 
-          <DateField
+          <FormInput
             label="Data de aplicação"
-            value={
-              applicationDate || 'dd/mm/aaaa'
+            value={applicationDate}
+            onChangeText={(t) =>
+              setApplicationDate(mascaraData(t))
             }
-            onPress={() => {}}
+            placeholder="dd/mm/aaaa"
+            keyboardType="number-pad"
+            maxLength={10}
           />
 
-          <DateField
+          <FormInput
             label="Próxima dose"
-            value={nextDose || 'dd/mm/aaaa'}
-            onPress={() => {}}
+            value={nextDose}
+            onChangeText={(t) =>
+              setNextDose(mascaraData(t))
+            }
+            placeholder="dd/mm/aaaa"
+            keyboardType="number-pad"
+            maxLength={10}
           />
 
           <FormInput
@@ -75,6 +180,7 @@ export default function NovaVacinaScreen() {
           <Button
             title="Salvar"
             onPress={handleSave}
+            loading={loading}
           />
         </View>
       </ScrollView>

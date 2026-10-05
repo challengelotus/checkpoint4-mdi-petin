@@ -1,22 +1,27 @@
 import { supabase } from './client';
-import { CalendarioService, EventoCalendario, CriarConsultaDTO } from '../../types/calendario';
+import { CalendarioService, EventoCalendario } from '../../types/calendario';
+import { CriarConsultaDTO } from '../../types/consulta';
 
 export const calendarioService: CalendarioService = {
   // 1. Retorna uma lista de strings YYYY-MM-DD com os dias que têm eventos no mês
   async obterDiasComEventosNoMes(petId: string, ano: number, mes: number): Promise<string[]> {
     const mesFormatado = String(mes).padStart(2, '0');
-    const inicioMes = `${ano}-${mesFormatado}-01T00:00:00.000Z`;
     // Pega o último dia do mês
     const ultimoDia = new Date(ano, mes, 0).getDate();
-    const fimMes = `${ano}-${mesFormatado}-${String(ultimoDia).padStart(2, '0')}T23:59:59.999Z`;
+    // Limites no fuso local do aparelho, convertidos para UTC (colunas timestamptz)
+    const inicioMes = new Date(ano, mes - 1, 1, 0, 0, 0, 0).toISOString();
+    const fimMes = new Date(ano, mes - 1, ultimoDia, 23, 59, 59, 999).toISOString();
+    // Doses de vacina usam coluna do tipo date (YYYY-MM-DD)
+    const inicioMesData = `${ano}-${mesFormatado}-01`;
+    const fimMesData = `${ano}-${mesFormatado}-${String(ultimoDia).padStart(2, '0')}`;
 
     const [vacinasRes, medsRes, consultasRes] = await Promise.all([
       supabase
         .from('vacinas')
         .select('doses_vacinas!inner(data_prevista)')
         .eq('pet_id', petId)
-        .gte('doses_vacinas.data_prevista', inicioMes.split('T')[0])
-        .lte('doses_vacinas.data_prevista', fimMes.split('T')[0]),
+        .gte('doses_vacinas.data_prevista', inicioMesData)
+        .lte('doses_vacinas.data_prevista', fimMesData),
 
       supabase
         .from('medicamentos')
@@ -34,21 +39,27 @@ export const calendarioService: CalendarioService = {
     ]);
 
     const diasSet = new Set<string>();
+    const diaLocal = (iso: string) => {
+      // Datas puras (YYYY-MM-DD) ficam como estão; timestamps viram dia local
+      if (!iso.includes('T')) return iso;
+      const d = new Date(iso);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
 
     vacinasRes.data?.forEach((v: any) => {
       v.doses_vacinas?.forEach((d: any) => {
-        if (d.data_prevista) diasSet.add(d.data_prevista.split('T')[0]);
+        if (d.data_prevista) diasSet.add(diaLocal(d.data_prevista));
       });
     });
 
     medsRes.data?.forEach((m: any) => {
       m.doses_medicamentos?.forEach((d: any) => {
-        if (d.data_prevista) diasSet.add(d.data_prevista.split('T')[0]);
+        if (d.data_prevista) diasSet.add(diaLocal(d.data_prevista));
       });
     });
 
     consultasRes.data?.forEach((c: any) => {
-      if (c.data_hora) diasSet.add(c.data_hora.split('T')[0]);
+      if (c.data_hora) diasSet.add(diaLocal(c.data_hora));
     });
 
     return Array.from(diasSet);
@@ -56,8 +67,9 @@ export const calendarioService: CalendarioService = {
 
   // 2. Busca o detalhamento dos eventos de um dia específico (YYYY-MM-DD)
   async obterEventosDoDia(petId: string, dataIso: string): Promise<EventoCalendario[]> {
-    const inicioDia = `${dataIso}T00:00:00.000Z`;
-    const fimDia = `${dataIso}T23:59:59.999Z`;
+    // Limites do dia no fuso local, convertidos para UTC
+    const inicioDia = new Date(`${dataIso}T00:00:00`).toISOString();
+    const fimDia = new Date(`${dataIso}T23:59:59.999`).toISOString();
 
     const [vacinasRes, medsRes, consultasRes] = await Promise.all([
       supabase

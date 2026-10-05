@@ -6,13 +6,10 @@ import {
 } from 'react-native';
 
 import { colors } from '@/theme';
+
 import { Typography } from '@/components/Typography/Typography';
 
-export interface Pet {
-  id: string;
-  name: string;
-  image?: string;
-}
+import { Pet } from '@/types/pet';
 
 interface PetSelectorProps {
   pets: Pet[];
@@ -42,9 +39,11 @@ export function PetSelector({
                 selected && styles.selected,
               ]}
             >
-              {pet.image ? (
+              {pet.fotoLink ? (
                 <Image
-                  source={{ uri: pet.image }}
+                  source={{
+                    uri: pet.fotoLink,
+                  }}
                   style={styles.image}
                 />
               ) : (
@@ -62,7 +61,7 @@ export function PetSelector({
               color={colors.backgroundLight}
               style={styles.name}
             >
-              {pet.name}
+              {pet.nome}
             </Typography>
           </Pressable>
         );
@@ -98,7 +97,8 @@ const styles = StyleSheet.create({
   },
 
   selected: {
-    borderWidth: 2,
+    borderWidth: 3,
+    borderColor: colors.backgroundLight,
   },
 
   image: {
@@ -108,5 +108,6 @@ const styles = StyleSheet.create({
 
   name: {
     marginTop: 3,
+    textAlign: 'center',
   },
 });

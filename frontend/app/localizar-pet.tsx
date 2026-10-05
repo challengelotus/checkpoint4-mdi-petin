@@ -9,6 +9,7 @@ import { router } from 'expo-router';
 import { colors } from '@/theme';
 
 import { Header } from '@/components/Header/Header';
+import { useAtivoPet } from '@/hooks/useAtivoPet';
 
 import {
   MapPlaceholder,
@@ -19,11 +20,13 @@ import {
 } from '@/components/PetLocationCard/PetLocationCard';
 
 export default function LocalizarPetScreen() {
+  const { pet } = useAtivoPet();
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Header
-            title="Localizar Chico"
+            title={pet ? `Localizar ${pet.nome}` : 'Localizar pet'}
             onBack={() => router.back()}
             titleColor={colors.backgroundLight}
         />

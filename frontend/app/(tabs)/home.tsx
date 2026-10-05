@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
+    Pressable,
     RefreshControl,
     ScrollView,
     StyleSheet,
@@ -20,6 +21,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { petService } from '@/services/supabase/petService';
 
 import { Pet } from '@/types/pet';
+import { Button } from '@/components/Button/Button';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
     const { usuario } = useAuth();
@@ -129,12 +132,32 @@ export default function HomeScreen() {
                 </View>
 
                 <View style={styles.titleContainer}>
-                    <Typography
-                        variant="h3"
-                        color={colors.brown}
-                    >
-                        Meus pets
-                    </Typography>
+                    <View style={{ flex: 1 }}>
+                        <Typography
+                            variant="h3"
+                            color={colors.brown}
+                        >
+                            Meus pets
+                        </Typography>
+
+                        <Typography
+                            variant="caption"
+                            color={colors.textSecondary}
+                            style={styles.subtitle}
+                        >
+                            {pets.length} pets cadastrados
+                        </Typography>
+                    </View>
+
+                    <View style={styles.actions}>
+                        <Pressable style={styles.emergencyButton} onPress={() => router.push('/emergencia')}>
+                            <MaterialCommunityIcons
+                                name="phone-in-talk"
+                                size={20}
+                                color={colors.backgroundLight}
+                            />
+                        </Pressable>
+                    </View>
                 </View>
 
                 {pets.length === 0 ? (
@@ -204,8 +227,34 @@ const styles = StyleSheet.create({
         marginBottom: 32,
     },
 
+    subtitle: {
+        marginTop: 4,
+    },
+
+    actions: {
+        flexDirection: 'row',
+
+        gap: 10,
+    },
+
+    emergencyButton: {
+        width: 38,
+        height: 38,
+
+        borderRadius: 10,
+
+        backgroundColor: colors.brownLight,
+
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
     titleContainer: {
         marginBottom: 16,
+
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
 
     petList: {

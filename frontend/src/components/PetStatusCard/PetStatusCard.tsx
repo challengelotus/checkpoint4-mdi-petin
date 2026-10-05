@@ -6,34 +6,47 @@ import {
 
 import { colors, typography } from '@/theme';
 
-type PetStatus = 'em-dia' | 'atencao' | 'atrasado';
+import { Pet } from '@/types/pet';
 
 interface PetStatusCardProps {
     name: string;
     species: string;
     breed: string;
-    status: PetStatus;
+    status: Pet["status"];
 }
 
-const statusConfig = {
-    'em-dia': {
-        label: 'Em dia',
-        color: colors.success,
-        backgroundColor: '#E5E9D5',
-    },
+function getConfiguracao(
+    status: Pet['status']
+) {
+    switch (status) {
+        case 'Atrasado':
+            return {
+                title: 'Atrasado',
+                description:
+                    'Existem cuidados pendentes.',
+                color: colors.error,
+                backgroundColor: '#F0CEC5',
+            };
 
-    atencao: {
-        label: 'Atenção',
-        color: colors.warning,
-        backgroundColor: '#F8E7C4',
-    },
+        case 'Atenção':
+            return {
+                title: 'Atenção',
+                description:
+                    'Alguns cuidados precisam de atenção.',
+                color: colors.warning,
+                backgroundColor: '#F8E7C4',
+            };
 
-    atrasado: {
-        label: 'Atrasado',
-        color: colors.error,
-        backgroundColor: '#F0CEC5',
-    },
-};
+        default:
+            return {
+                title: 'Em Dia',
+                description:
+                    'Todos os cuidados estão em dia.',
+                color: colors.success,
+                backgroundColor: '#E5E9D5',
+            };
+    }
+}
 
 export function PetStatusCard({
     name,
@@ -41,7 +54,9 @@ export function PetStatusCard({
     breed,
     status,
 }: PetStatusCardProps) {
-    const config = statusConfig[status];
+    const statusAtual = status ?? 'Em Dia';
+
+    const config = getConfiguracao(statusAtual);
 
     return (
         <View
@@ -80,7 +95,7 @@ export function PetStatusCard({
                         },
                     ]}
                 >
-                    {config.label}
+                    {config.title}
                 </Text>
             </View>
         </View>

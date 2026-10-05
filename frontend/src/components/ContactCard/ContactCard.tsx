@@ -15,16 +15,19 @@ interface ContactCardProps {
     name: string;
     description: string;
     onPress?: () => void;
+    onLongPress?: () => void;
 }
 
 export function ContactCard({
     name,
     description,
     onPress,
+    onLongPress,
 }: ContactCardProps) {
     return (
         <Pressable
             onPress={onPress}
+            onLongPress={onLongPress}
             style={({ pressed }) => [
                 styles.container,
                 pressed && styles.pressed,

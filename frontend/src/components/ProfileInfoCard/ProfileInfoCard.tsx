@@ -50,6 +50,8 @@ export function ProfileInfoCard({
 
 const styles = StyleSheet.create({
   container: {
+    marginHorizontal: 28,
+
     paddingHorizontal: 18,
 
     borderRadius: 16,

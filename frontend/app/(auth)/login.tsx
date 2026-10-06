@@ -26,25 +26,24 @@ export default function LoginScreen() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [erros, setErros] = useState({});
 
     const [loading, setLoading] = useState(false);
 
-    async function handleLogin() {
+    const validarCampos = () => {
+        const e = {};
         if (!email.trim()) {
-            Alert.alert(
-                'Atenção',
-                'Digite seu e-mail.'
-            );
-
-            return;
+            e.email = 'E-mail é obrigatório.';
         }
-
         if (!password) {
-            Alert.alert(
-                'Atenção',
-                'Digite sua senha.'
-            );
+            e.password = 'Senha inválida.';
+        }
+        setErros(e);
+        return Object.keys(e).length === 0;
+    };
 
+    async function handleLogin() {
+        if (!validarCampos()) {
             return;
         }
 
@@ -117,6 +116,14 @@ export default function LoginScreen() {
                         autoCapitalize="none"
                         autoCorrect={false}
                     />
+                    {erros.email && (
+                        <Typography
+                            variant="caption"
+                            color={colors.error}
+                        >
+                            {erros.email}
+                        </Typography>
+                    )}
 
                     <FormInput
                         label="Senha"
@@ -124,6 +131,14 @@ export default function LoginScreen() {
                         onChangeText={setPassword}
                         secureTextEntry
                     />
+                    {erros.password && (
+                        <Typography
+                            variant="caption"
+                            color={colors.error}
+                        >
+                            {erros.password}
+                        </Typography>
+                    )}
 
                     <Button
                         title="Entrar"

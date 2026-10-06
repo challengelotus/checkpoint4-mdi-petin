@@ -5,6 +5,7 @@ import {
   LoginDTO,
   AuthResponse,
   Usuario,
+  AtualizarPerfilDTO,
 } from '../../types/auth';
 
 export const authService: AuthService = {
@@ -80,6 +81,8 @@ export const authService: AuthService = {
       nome: perfilData.nome,
       email: perfilData.email,
       plano: perfilData.plano,
+      telefone: perfilData.telefone ?? undefined,
+      cidade: perfilData.cidade ?? undefined,
       ativo: perfilData.ativo,
       createdAt: perfilData.created_at,
     };
@@ -113,6 +116,8 @@ export const authService: AuthService = {
       nome: perfilData.nome,
       email: perfilData.email,
       plano: perfilData.plano,
+      telefone: perfilData.telefone ?? undefined,
+      cidade: perfilData.cidade ?? undefined,
       ativo: perfilData.ativo,
       createdAt: perfilData.created_at,
     };
@@ -121,5 +126,57 @@ export const authService: AuthService = {
   async obterSessaoAtiva(): Promise<string | null> {
     const { data: { session } } = await supabase.auth.getSession();
     return session?.access_token ?? null;
+  },
+
+  async atualizarPerfil(id: string, dados: AtualizarPerfilDTO): Promise<Usuario> {
+    // Troca de e-mail passa primeiro pelo Supabase Auth (pode exigir confirmação por e-mail)
+    if (dados.email !== undefined) {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user && user.email !== dados.email) {
+        const { error: emailError } = await supabase.auth.updateUser({ email: dados.email });
+        if (emailError) throw new Error(`Erro ao atualizar e-mail: ${emailError.message}`);
+      }
+    }
+
+    const payload: Record<string, unknown> = {};
+    if (dados.nome !== undefined) payload.nome = dados.nome;
+    if (dados.email !== undefined) payload.email = dados.email;
+    if (dados.telefone !== undefined) payload.telefone = dados.telefone || null;
+    if (dados.cidade !== undefined) payload.cidade = dados.cidade || null;
+
+    const { data, error } = await supabase
+      .from('usuarios')
+      .update(payload)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Erro ao atualizar perfil: ${error?.message ?? 'perfil não encontrado'}`);
+    }
+
+    return {
+      id: data.id,
+      nome: data.nome,
+      email: data.email,
+      plano: data.plano,
+      telefone: data.telefone ?? undefined,
+      cidade: data.cidade ?? undefined,
+      ativo: data.ativo,
+      createdAt: data.created_at,
+    };
+  },
+
+  async alterarSenha(novaSenha: string): Promise<void> {
+    const { error } = await supabase.auth.updateUser({ password: novaSenha });
+    if (error) throw new Error(`Erro ao alterar senha: ${error.message}`);
+  },
+
+  async desativarConta(id: string): Promise<void> {
+    const { error } = await supabase.from('usuarios').update({ ativo: false }).eq('id', id);
+    if (error) throw new Error(`Erro ao desativar conta: ${error.message}`);
+
+    await supabase.auth.signOut();
   },
 };

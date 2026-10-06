@@ -19,6 +19,7 @@ interface AuthContextData {
         senha: string
     ) => Promise<void>;
     logout: () => Promise<void>;
+    recarregarUsuario: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>(
@@ -91,6 +92,13 @@ export function AuthProvider({
         setUsuario(null);
     }
 
+    async function recarregarUsuario() {
+        const usuarioAtual =
+            await authService.obterUsuarioAtual();
+
+        setUsuario(usuarioAtual);
+    }
+
     return (
         <AuthContext.Provider
             value={{
@@ -99,6 +107,7 @@ export function AuthProvider({
                 autenticado: !!usuario,
                 login,
                 logout,
+                recarregarUsuario,
             }}
         >
             {children}

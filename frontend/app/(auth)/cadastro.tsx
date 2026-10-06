@@ -21,6 +21,36 @@ import { Button } from '@/components/Button/Button';
 
 import { authService } from '@/services/supabase/authService';
 
+const CampoObrigatorio = ({
+    label, 
+    value, 
+    changeText,
+    secureText = false,
+    keyboardType = 'default',
+    autoCap = 'none',
+    erro,}) => (
+        <View style={styles.inputContainer}>
+            <FormInput
+                label={label}
+                value={value}
+                onChangeText={changeText}
+                secureTextEntry={secureText}
+                keyboardType={keyboardType}
+                autoCapitalize={autoCap}
+                autoCorrect={false}
+            />
+
+            {erro && (
+                <Typography
+                    variant="caption"
+                    color={colors.error}
+                >
+                    {erro}
+                </Typography>
+            )}
+        </View>
+    );
+
 export default function CadastroScreen() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -29,6 +59,38 @@ export default function CadastroScreen() {
         useState('');
 
     const [loading, setLoading] = useState(false);
+    const [erros, setErros] = useState({});
+
+    const validarCampos = ({nome, email, password, confirmPassword}) => {
+        const e = {};
+
+        if (!nome) {
+            e.nome = 'Digite seu nome completo.';
+        } else if (nome.length < 3) {
+            e.nome = 'Digite um nome válido.';
+        }
+
+        if (!email) {
+            e.email = 'Digite seu e-mail.';
+        } else if (!isEmailValido(email)) {
+            e.email = 'Digite um e-mail válido.';
+        }
+
+        if (!password) {
+            e.password = 'Digite uma senha.';
+        } else if (password.length < 6) {
+            e.password = 'A senha deve possuir pelo menos 6 caracteres.';
+        }
+
+        if (!confirmPassword) {
+            e.confirmPassword = 'Confirme sua senha.';
+        } else if (password !== confirmPassword) {
+            e.confirmPassword = 'As senhas não coincidem.';
+        }
+
+        setErros(e);
+        return Object.keys(e).length === 0;
+    };
 
     async function handleCadastro() {
         // Remove espaços desnecessários
@@ -36,79 +98,7 @@ export default function CadastroScreen() {
         const emailNormalizado =
             email.trim().toLowerCase();
 
-        // Validação do nome
-        if (!nome) {
-            Alert.alert(
-                'Atenção',
-                'Digite seu nome completo.'
-            );
-
-            return;
-        }
-
-        if (nome.length < 3) {
-            Alert.alert(
-                'Atenção',
-                'Digite um nome válido.'
-            );
-
-            return;
-        }
-
-        // Validação do e-mail
-        if (!emailNormalizado) {
-            Alert.alert(
-                'Atenção',
-                'Digite seu e-mail.'
-            );
-
-            return;
-        }
-
-        if (!isEmailValido(emailNormalizado)) {
-            Alert.alert(
-                'Atenção',
-                'Digite um e-mail válido.'
-            );
-
-            return;
-        }
-
-        // Validação da senha
-        if (!password) {
-            Alert.alert(
-                'Atenção',
-                'Digite uma senha.'
-            );
-
-            return;
-        }
-
-        if (password.length < 6) {
-            Alert.alert(
-                'Atenção',
-                'A senha deve possuir pelo menos 6 caracteres.'
-            );
-
-            return;
-        }
-
-        // Confirmação da senha
-        if (!confirmPassword) {
-            Alert.alert(
-                'Atenção',
-                'Confirme sua senha.'
-            );
-
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            Alert.alert(
-                'Atenção',
-                'As senhas não coincidem.'
-            );
-
+        if (!validarCampos({nome, email: emailNormalizado, password, confirmPassword})) {
             return;
         }
 
@@ -191,6 +181,7 @@ export default function CadastroScreen() {
             mensagem.includes('already registered') ||
             mensagem.includes('user already registered')
         ) {
+            setErros({ ...erros, email: 'E-mail já cadastrado.' });
             return 'Este e-mail já está cadastrado.';
         }
 
@@ -242,39 +233,36 @@ export default function CadastroScreen() {
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                 >
-                    <FormInput
+                    <CampoObrigatorio
                         label="Nome completo"
                         value={name}
-                        onChangeText={setName}
-                        autoCapitalize="words"
-                        autoCorrect={false}
+                        changeText={setName}
+                        autoCap="words"
+                        erro={erros.nome}
                     />
 
-                    <FormInput
+                    <CampoObrigatorio
                         label="E-mail"
                         value={email}
-                        onChangeText={setEmail}
+                        changeText={setEmail}
                         keyboardType="email-address"
-                        autoCapitalize="none"
-                        autoCorrect={false}
+                        erro={erros.email}
                     />
 
-                    <FormInput
+                    <CampoObrigatorio
                         label="Senha"
                         value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                        autoCapitalize="none"
-                        autoCorrect={false}
+                        changeText={setPassword}
+                        secureText={true}
+                        erro={erros.password}
                     />
 
-                    <FormInput
+                    <CampoObrigatorio
                         label="Confirmar senha"
                         value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        secureTextEntry
-                        autoCapitalize="none"
-                        autoCorrect={false}
+                        changeText={setConfirmPassword}
+                        secureText={true}
+                        erro={erros.confirmPassword}
                     />
 
                     <Button
@@ -348,6 +336,10 @@ const styles = StyleSheet.create({
         paddingBottom: 30,
 
         gap: 18,
+    },
+
+    inputContainer: {
+        gap: 10,
     },
 
     loginContainer: {

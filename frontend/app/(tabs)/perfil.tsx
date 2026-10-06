@@ -40,6 +40,7 @@ import {
   LIMITE_VACINAS_FREE,
   nomeDoPlano,
 } from '@/utils/planos';
+import { Avatar } from '@/components/Avatar/Avatar';
 
 interface Resumo {
   pets: number;
@@ -190,12 +191,11 @@ export default function PerfilScreen() {
         {/* Cabeçalho do usuário */}
         <View style={styles.userRow}>
           <View style={styles.avatar}>
-            <Typography
-              variant="h2"
-              color={colors.brown}
-            >
-              {iniciais(usuario.nome)}
-            </Typography>
+            <Avatar
+              uri={usuario?.fotoLink}
+              nome={usuario.nome}
+              size={60}
+            />
           </View>
 
           <View style={styles.userInfo}>

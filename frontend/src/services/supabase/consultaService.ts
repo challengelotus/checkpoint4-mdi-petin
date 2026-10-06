@@ -1,4 +1,5 @@
 import { supabase } from './client';
+import { redirecionarParaAssinatura } from '../../utils/planoLimite';
 import {
   Consulta,
   ConsultaService,
@@ -70,8 +71,8 @@ export const consultaService: ConsultaService = {
         .eq('pet_id', consultaData.petId);
 
       if ((count ?? 0) >= 3) {
-        throw new Error(
-          'LIMITE_PLANO_FREE: O plano Gratuito permite apenas até 3 consultas cadastradas por pet.'
+        throw redirecionarParaAssinatura(
+          'O plano Gratuito permite apenas até 3 consultas por pet. Assine o Premium para cadastrar mais.'
         );
       }
     }

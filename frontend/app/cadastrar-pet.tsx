@@ -21,6 +21,7 @@ import { PawIcon } from '@/components/PawIcon/PawIcon';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { petService } from '@/services/supabase/petService';
+import { ehLimitePlano } from '@/utils/planoLimite';
 import { Header } from '@/components/Header/Header';
 
 export default function CadastroPetScreen() {
@@ -121,6 +122,11 @@ export default function CadastroPetScreen() {
                 ]
             );
         } catch (error) {
+            // Limite do plano: o service já levou o usuário à tela de assinatura
+            if (ehLimitePlano(error)) {
+                return;
+            }
+
             console.error(
                 'Erro ao cadastrar pet:',
                 error

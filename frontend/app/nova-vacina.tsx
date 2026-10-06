@@ -20,6 +20,7 @@ import { Button } from '@/components/Button/Button';
 
 import { vacinaService } from '@/services/supabase/vacinaService';
 import { CriarDoseVacinaDTO } from '@/types/vacina';
+import { ehLimitePlano } from '@/utils/planoLimite';
 import {
   dataBRparaISO,
   mascaraData,
@@ -113,6 +114,9 @@ export default function NovaVacinaScreen() {
 
       router.back();
     } catch (error) {
+      // Limite do plano: o service já levou o usuário à tela de assinatura
+      if (ehLimitePlano(error)) return;
+
       console.error('Erro ao cadastrar vacina:', error);
       Alert.alert(
         'Erro',

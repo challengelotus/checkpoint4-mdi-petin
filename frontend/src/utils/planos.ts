@@ -1,6 +1,7 @@
 import { Usuario } from '@/types/auth';
 
 /** Limites do plano gratuito (os mesmos aplicados em vacinaService e medicamentoService). */
+export const LIMITE_PETS_FREE = 1;
 export const LIMITE_VACINAS_FREE = 5;
 export const LIMITE_MEDICAMENTOS_FREE = 3;
 
@@ -11,7 +12,8 @@ export const LIMITE_MEDICAMENTOS_FREE = 3;
  */
 export const PREMIUM_CHECKOUT_URL =
   process.env.EXPO_PUBLIC_PREMIUM_CHECKOUT_URL ?? '';
-export const PREMIUM_PRECO = process.env.EXPO_PUBLIC_PREMIUM_PRECO ?? '';
+export const PREMIUM_PRECO = process.env.EXPO_PUBLIC_PREMIUM_PRECO ?? 'R$19,90';
+export const FREE_PRECO = 'R$0,00';
 
 export function nomeDoPlano(plano?: Usuario['plano']): string {
   return plano === 'PREMIUM' ? 'Premium' : 'Gratuito';

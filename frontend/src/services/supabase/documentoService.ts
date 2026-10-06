@@ -1,4 +1,5 @@
 import { supabase } from './client';
+import { redirecionarParaAssinatura } from '../../utils/planoLimite';
 import {
   Documento,
   CriarDocumentoDTO,
@@ -70,7 +71,9 @@ export const documentoService: DocumentoService = {
 
     // Validação de Plano Premium para documentos/anexos
     if (plano === 'FREE') {
-      throw new Error('LIMITE_PLANO_FREE: O envio e anexo de documentos é exclusivo para usuários Premium.');
+      throw redirecionarParaAssinatura(
+        'O envio e anexo de documentos é exclusivo para usuários Premium.'
+      );
     }
 
     const { data, error } = await supabase
@@ -125,14 +128,16 @@ export const documentoService: DocumentoService = {
   },
 
   async uploadAnexo(
-    petId: string, 
-    fileBuffer: ArrayBuffer | Blob, 
+    petId: string,
+    fileBuffer: ArrayBuffer | Blob,
     fileExtension: string
   ): Promise<string> {
     const plano = await validarPlanoUsuarioPorPet(petId);
 
     if (plano === 'FREE') {
-      throw new Error('LIMITE_PLANO_FREE: Upload de anexos de documentos é restrito ao plano Premium.');
+      throw redirecionarParaAssinatura(
+        'O upload de anexos de documentos é restrito ao plano Premium.'
+      );
     }
 
     const fileName = `documentos/${petId}_${Date.now()}.${fileExtension}`;

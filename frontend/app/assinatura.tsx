@@ -12,6 +12,7 @@ import {
 import {
   router,
   useFocusEffect,
+  useLocalSearchParams,
 } from 'expo-router';
 
 import {
@@ -26,19 +27,23 @@ import { Typography } from '@/components/Typography/Typography';
 
 import { useAuth } from '@/contexts/AuthContext';
 import {
+  LIMITE_PETS_FREE,
   LIMITE_MEDICAMENTOS_FREE,
   LIMITE_VACINAS_FREE,
+  FREE_PRECO,
   PREMIUM_PRECO,
   montarUrlCheckout,
   nomeDoPlano,
 } from '@/utils/planos';
 
 const BENEFICIOS_PREMIUM = [
+  'Cadastro ilimitados de pets',
   'Vacinas ilimitadas por pet',
   'Medicamentos ilimitados por pet',
 ];
 
 const LIMITES_FREE = [
+  `Até ${LIMITE_PETS_FREE} cadastro de pet`,
   `Até ${LIMITE_VACINAS_FREE} vacinas por pet`,
   `Até ${LIMITE_MEDICAMENTOS_FREE} medicamentos por pet`,
 ];
@@ -64,6 +69,7 @@ function ItemLista({
 
 export default function AssinaturaScreen() {
   const { usuario, recarregarUsuario } = useAuth();
+  const { motivo } = useLocalSearchParams<{ motivo?: string }>();
   const [abrindo, setAbrindo] = useState(false);
 
   const premium = usuario?.plano === 'PREMIUM';
@@ -91,7 +97,7 @@ export default function AssinaturaScreen() {
     if (!url) {
       Alert.alert(
         'Checkout indisponível',
-        'O link de pagamento ainda não foi configurado (EXPO_PUBLIC_PREMIUM_CHECKOUT_URL).'
+        'feature não implementada.'
       );
       return;
     }
@@ -117,6 +123,24 @@ export default function AssinaturaScreen() {
           onBack={() => router.back()}
         />
 
+        {!!motivo && !premium && (
+          <View style={styles.reason}>
+            <MaterialCommunityIcons
+              name="lock-outline"
+              size={18}
+              color={colors.brown}
+            />
+
+            <Typography
+              variant="caption"
+              color={colors.brown}
+              style={styles.reasonText}
+            >
+              {motivo}
+            </Typography>
+          </View>
+        )}
+
         <View style={styles.current}>
           <Typography variant="caption" color={colors.textSecondary}>
             Seu plano atual
@@ -128,9 +152,17 @@ export default function AssinaturaScreen() {
         </View>
 
         <View style={[styles.card, premium && styles.cardDimmed]}>
-          <Typography variant="bodySemiBold" color={colors.brown}>
-            Gratuito
-          </Typography>
+          <View style={styles.freeHeader}>
+            <Typography variant="bodySemiBold" color={colors.brown}>
+              Gratuito
+            </Typography>
+
+            {!!FREE_PRECO && (
+              <Typography variant="bodySemiBold" color={colors.primary}>
+                {FREE_PRECO}
+              </Typography>
+            )}
+          </View>
 
           <View style={styles.list}>
             {LIMITES_FREE.map((t) => (
@@ -215,6 +247,23 @@ const styles = StyleSheet.create({
     gap: 16,
   },
 
+  reason: {
+    padding: 14,
+
+    borderRadius: 14,
+
+    backgroundColor: colors.warningLight,
+
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    gap: 10,
+  },
+
+  reasonText: {
+    flex: 1,
+  },
+
   current: {
     marginTop: 10,
   },
@@ -229,6 +278,12 @@ const styles = StyleSheet.create({
 
   cardDimmed: {
     opacity: 0.7,
+  },
+
+  freeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 
   cardPremium: {

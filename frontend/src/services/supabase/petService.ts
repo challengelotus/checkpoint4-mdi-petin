@@ -1,4 +1,5 @@
 import { supabase } from './client';
+import { redirecionarParaAssinatura } from '../../utils/planoLimite';
 import {
   Pet,
   PetService,
@@ -10,7 +11,7 @@ import {
 
 async function calcularStatusPet(petId: string): Promise<StatusPet> {
   const agora = new Date().toISOString();
-  const hojeData = agora.split('T')[0]; 
+  const hojeData = agora.split('T')[0];
   const emTresDiasDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const emTresDiasISO = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -135,7 +136,10 @@ export const petService: PetService = {
         .eq('ativo', true);
 
       if ((count ?? 0) >= 1) {
-        throw new Error('LIMITE_PLANO_FREE: O plano Gratuito permite apenas 1 pet cadastrado.');
+        // Em vez de exibir alert, leva o usuário direto para a tela de assinatura
+        throw redirecionarParaAssinatura(
+          'O plano Gratuito permite apenas 1 pet cadastrado. Assine o Premium para cadastrar mais pets.'
+        );
       }
     }
 

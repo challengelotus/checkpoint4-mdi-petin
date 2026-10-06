@@ -1,4 +1,5 @@
 import { supabase } from './client';
+import { redirecionarParaAssinatura } from '../../utils/planoLimite';
 import {
   Medicamento,
   DoseMedicamento,
@@ -111,8 +112,8 @@ export const medicamentoService: MedicamentoService = {
         .eq('pet_id', dto.petId);
 
       if ((count ?? 0) >= 3) {
-        throw new Error(
-          'LIMITE_PLANO_FREE: O plano Gratuito permite no máximo 3 medicamentos cadastrados por pet.'
+        throw redirecionarParaAssinatura(
+          'O plano Gratuito permite no máximo 3 medicamentos por pet. Assine o Premium para medicamentos ilimitados.'
         );
       }
     }
@@ -200,7 +201,7 @@ export const medicamentoService: MedicamentoService = {
     dataAplicacao?: string
   ): Promise<DoseMedicamento> {
     const payload: Record<string, unknown> = { status };
-    
+
     if (status === 'CONCLUIDO') {
       payload.data_aplicacao = dataAplicacao || new Date().toISOString();
     } else {

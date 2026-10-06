@@ -1,4 +1,5 @@
 import { supabase } from './client';
+import { redirecionarParaAssinatura } from '../../utils/planoLimite';
 import {
   VacinaService,
   ResumoVacina,
@@ -45,11 +46,11 @@ export const vacinaService: VacinaService = {
         observacoes: v.observacoes,
         proximaDose: proxima
           ? {
-              id: proxima.id,
-              numeroDose: proxima.numero_dose,
-              dataPrevista: proxima.data_prevista,
-              status: proxima.status,
-            }
+            id: proxima.id,
+            numeroDose: proxima.numero_dose,
+            dataPrevista: proxima.data_prevista,
+            status: proxima.status,
+          }
           : undefined,
       };
     });
@@ -122,7 +123,9 @@ export const vacinaService: VacinaService = {
         .eq('pet_id', dados.petId);
 
       if ((count ?? 0) >= 5) {
-        throw new Error('LIMITE_PLANO_FREE: O plano Gratuito permite cadastrar no máximo 5 vacinas por pet.');
+        throw redirecionarParaAssinatura(
+          'O plano Gratuito permite cadastrar no máximo 5 vacinas por pet. Assine o Premium para vacinas ilimitadas.'
+        );
       }
     }
 

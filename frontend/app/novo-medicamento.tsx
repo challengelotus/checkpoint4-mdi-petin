@@ -19,6 +19,7 @@ import { FormInput } from '@/components/FormInput/FormInput';
 import { Button } from '@/components/Button/Button';
 
 import { medicamentoService } from '@/services/supabase/medicamentoService';
+import { ehLimitePlano } from '@/utils/planoLimite';
 import {
   combinarDataHoraISO,
   dataBRparaISO,
@@ -86,6 +87,9 @@ export default function NovoMedicamentoScreen() {
 
       router.back();
     } catch (error) {
+      // Limite do plano: o service já levou o usuário à tela de assinatura
+      if (ehLimitePlano(error)) return;
+
       console.error('Erro ao cadastrar medicamento:', error);
       Alert.alert(
         'Erro',

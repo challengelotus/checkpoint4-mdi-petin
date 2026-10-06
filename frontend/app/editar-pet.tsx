@@ -20,9 +20,16 @@ import { Typography } from '@/components/Typography/Typography';
 import { FormInput } from '@/components/FormInput/FormInput';
 import { Button } from '@/components/Button/Button';
 import { Header } from '@/components/Header/Header';
+import { Avatar } from '@/components/Avatar/Avatar';
 
 import { petService } from '@/services/supabase/petService';
 import { Pet } from '@/types/pet';
+
+import {
+  ImagemEscolhida,
+  escolherOrigemEImagem,
+} from '@/utils/imagem';
+
 import {
   dataBRparaISO,
   isoParaDataBR,
@@ -40,6 +47,7 @@ export default function EditarPetScreen() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [foto, setFoto] = useState<ImagemEscolhida | null>(null);
 
   const [name, setName] = useState('');
   const [breed, setBreed] = useState('');
@@ -95,6 +103,11 @@ export default function EditarPetScreen() {
     carregar();
   }, [petId]);
 
+  async function alterarFoto() {
+    const imagem = await escolherOrigemEImagem();
+    if (imagem) setFoto(imagem);
+  }
+
   async function handleSave() {
     if (!pet) return;
 
@@ -136,6 +149,11 @@ export default function EditarPetScreen() {
 
     try {
       setSaving(true);
+
+      // Foto só é enviada ao salvar; cancelar a edição descarta a escolha
+      if (foto) {
+        await petService.uploadFotoPerfil(pet.id, foto.buffer, foto.extensao);
+      }
 
       await petService.atualizar(pet.id, {
         nome: name.trim(),
@@ -181,6 +199,24 @@ export default function EditarPetScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+
+        <View style={styles.photoWrapper}>
+          <Avatar
+            uri={foto?.uri ?? pet?.fotoLink}
+            nome={name || pet?.nome}
+            size={90}
+          />
+
+          <Pressable onPress={alterarFoto} hitSlop={10}>
+            <Typography
+              variant="captionMedium"
+              color={colors.primary}
+              style={styles.changePhoto}
+            >
+              Alterar foto
+            </Typography>
+          </Pressable>
+        </View>
 
         <View style={styles.form}>
           <FormInput
@@ -299,6 +335,16 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 42,
     paddingBottom: 40,
+  },
+
+  photoWrapper: {
+    marginTop: 24,
+
+    alignItems: 'center',
+  },
+
+  changePhoto: {
+    marginTop: 10,
   },
 
   form: {

@@ -8,8 +8,14 @@ import {
 import { colors } from '@/theme';
 
 import { Typography } from '@/components/Typography/Typography';
+import { Avatar } from '@/components/Avatar/Avatar';
 
 import { Pet } from '@/types/pet';
+
+import {
+  ImagemEscolhida,
+  escolherOrigemEImagem,
+} from '@/utils/imagem';
 
 interface PetCardProps {
     pet: Pet;
@@ -30,16 +36,11 @@ export function PetCard({
                 getStatusStyle(status),
             ]}
         >
-            {pet.fotoLink ? (
-                <Image
-                    source={{
-                        uri: pet.fotoLink,
-                    }}
-                    style={styles.image}
-                />
-            ) : (
-                <View style={styles.placeholder} />
-            )}
+            <Avatar
+                uri={pet?.fotoLink}
+                nome={pet?.nome}
+                size={42}
+            />
 
             <View style={styles.info}>
                 <Typography

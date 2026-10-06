@@ -26,7 +26,14 @@
     "plugins": [
       "expo-font",
       "expo-router",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O aplicativo precisa acessar suas fotos para que você possa enviar imagens de perfil.",
+          "cameraPermission": "O aplicativo precisa acessar sua câmera para que você possa tirar fotos de perfil."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

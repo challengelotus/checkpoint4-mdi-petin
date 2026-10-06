@@ -5,6 +5,7 @@ export interface Usuario {
   plano: 'FREE' | 'PREMIUM';
   telefone?: string;
   cidade?: string;
+  fotoLink?: string;
   ativo: boolean;
   createdAt?: string;
 }
@@ -41,4 +42,5 @@ export interface AuthService {
   atualizarPerfil(id: string, dados: AtualizarPerfilDTO): Promise<Usuario>;
   alterarSenha(novaSenha: string): Promise<void>;
   desativarConta(id: string): Promise<void>;
+  uploadFotoPerfil(id: string, fileBuffer: ArrayBuffer | Blob, fileExtension: string): Promise<string>;
 }

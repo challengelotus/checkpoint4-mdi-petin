@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import {
   Alert,
+  Pressable,
   ScrollView,
   StyleSheet,
   View,
@@ -15,10 +16,15 @@ import { Header } from '@/components/Header/Header';
 import { FormInput } from '@/components/FormInput/FormInput';
 import { Button } from '@/components/Button/Button';
 import { Typography } from '@/components/Typography/Typography';
+import { Avatar } from '@/components/Avatar/Avatar';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { authService } from '@/services/supabase/authService';
-import { iniciais, mensagemErro } from '@/utils/date';
+import { mensagemErro } from '@/utils/date';
+import {
+  ImagemEscolhida,
+  escolherOrigemEImagem,
+} from '@/utils/imagem';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -38,6 +44,7 @@ export default function EditarPerfilScreen() {
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
   const [cidade, setCidade] = useState('');
+  const [foto, setFoto] = useState<ImagemEscolhida | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -48,6 +55,11 @@ export default function EditarPerfilScreen() {
     setTelefone(usuario.telefone ?? '');
     setCidade(usuario.cidade ?? '');
   }, [usuario?.id]);
+
+  async function alterarFoto() {
+    const imagem = await escolherOrigemEImagem();
+    if (imagem) setFoto(imagem);
+  }
 
   async function handleSave() {
     if (!usuario) return;
@@ -69,6 +81,11 @@ export default function EditarPerfilScreen() {
 
     try {
       setSaving(true);
+
+      // Foto só é enviada ao salvar; cancelar a edição descarta a escolha
+      if (foto) {
+        await authService.uploadFotoPerfil(usuario.id, foto.buffer, foto.extensao);
+      }
 
       await authService.atualizarPerfil(usuario.id, {
         nome: nomeLimpo,
@@ -111,14 +128,21 @@ export default function EditarPerfilScreen() {
         />
 
         <View style={styles.avatarWrapper}>
-          <View style={styles.avatar}>
+          <Avatar
+            uri={foto?.uri ?? usuario?.fotoLink}
+            nome={nome}
+            size={90}
+          />
+
+          <Pressable onPress={alterarFoto} hitSlop={10}>
             <Typography
-              variant="h2"
-              color={colors.brown}
+              variant="captionMedium"
+              color={colors.primary}
+              style={styles.changePhoto}
             >
-              {iniciais(nome)}
+              Alterar foto
             </Typography>
-          </View>
+          </Pressable>
         </View>
 
         <View style={styles.form}>
@@ -185,16 +209,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  avatar: {
-    width: 90,
-    height: 90,
-
-    borderRadius: 45,
-
-    backgroundColor: colors.orange,
-
-    alignItems: 'center',
-    justifyContent: 'center',
+  changePhoto: {
+    marginTop: 10,
   },
 
   form: {

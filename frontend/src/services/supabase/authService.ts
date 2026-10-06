@@ -83,6 +83,7 @@ export const authService: AuthService = {
       plano: perfilData.plano,
       telefone: perfilData.telefone ?? undefined,
       cidade: perfilData.cidade ?? undefined,
+      fotoLink: perfilData.foto_link ?? undefined,
       ativo: perfilData.ativo,
       createdAt: perfilData.created_at,
     };
@@ -118,6 +119,7 @@ export const authService: AuthService = {
       plano: perfilData.plano,
       telefone: perfilData.telefone ?? undefined,
       cidade: perfilData.cidade ?? undefined,
+      fotoLink: perfilData.foto_link ?? undefined,
       ativo: perfilData.ativo,
       createdAt: perfilData.created_at,
     };
@@ -163,6 +165,7 @@ export const authService: AuthService = {
       plano: data.plano,
       telefone: data.telefone ?? undefined,
       cidade: data.cidade ?? undefined,
+      fotoLink: data.foto_link ?? undefined,
       ativo: data.ativo,
       createdAt: data.created_at,
     };
@@ -178,5 +181,33 @@ export const authService: AuthService = {
     if (error) throw new Error(`Erro ao desativar conta: ${error.message}`);
 
     await supabase.auth.signOut();
+  },
+
+  async uploadFotoPerfil(
+    id: string,
+    fileBuffer: ArrayBuffer | Blob,
+    fileExtension: string
+  ): Promise<string> {
+    const fileName = `usuarios/${id}_${Date.now()}.${fileExtension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('petin-midias')
+      .upload(fileName, fileBuffer, {
+        contentType: `image/${fileExtension}`,
+        upsert: true,
+      });
+
+    if (uploadError) throw new Error(`Erro no upload da foto: ${uploadError.message}`);
+
+    const { data } = supabase.storage.from('petin-midias').getPublicUrl(fileName);
+
+    const { error } = await supabase
+      .from('usuarios')
+      .update({ foto_link: data.publicUrl })
+      .eq('id', id);
+
+    if (error) throw new Error(`Erro ao salvar foto no perfil: ${error.message}`);
+
+    return data.publicUrl;
   },
 };

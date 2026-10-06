@@ -10,6 +10,12 @@ import { router } from 'expo-router';
 import { colors } from '@/theme';
 import { Typography } from '@/components/Typography/Typography';
 import { Header } from '@/components/Header/Header';
+import { Avatar } from '../Avatar/Avatar';
+
+import {
+  ImagemEscolhida,
+  escolherOrigemEImagem,
+} from '@/utils/imagem';
 
 interface ProfileHeaderProps {
   name: string;
@@ -41,18 +47,11 @@ export function ProfileHeader({
 
       <View style={styles.petContainer}>
         <View style={styles.petInfo}>
-          <View style={styles.imageContainer}>
-            {image ? (
-              <Image
-                source={{ uri: image }}
-                style={styles.image}
-              />
-            ) : (
-              <Typography variant="h3">
-                🐶
-              </Typography>
-            )}
-          </View>
+          <Avatar
+            uri={image}
+            nome={name}
+            size={90}
+          />
 
           <View>
             <Typography

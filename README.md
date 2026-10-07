@@ -73,7 +73,7 @@ O pagamento é feito por um **link de checkout externo** (ex.: Stripe Payment Li
 🔗 **[Acessar Protótipo no Figma](https://www.figma.com/proto/nD5XSQOaVLNMA6bBoJ2MJA/Sem-t%C3%ADtulo?node-id=5-165&t=teiQvUETLAFzmC1V-1)**
 
 <div align="center">
-  <img src="assets/screenshot-demo.png" alt="Demonstração das Telas do Petin" width="700"/>
+  <video src="https://github.com/user-attachments/assets/e8a733e8-f860-4460-83c7-c2cf19018182" alt="Demonstração das Telas do Petin" width="700"/>
 </div>
 
 ---
